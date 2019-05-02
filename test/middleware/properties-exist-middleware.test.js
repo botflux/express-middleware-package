@@ -162,4 +162,37 @@ describe ('#fileExistsMiddleware', () => {
             message: expect.stringContaining ('A property is missing')
         }))
     })
+
+    it ('calls next when properties defined and a unchecked property', () => {
+        const middleware = fileExistsMiddleware ('body', [ 'lastName', 'firstName', 'age' ])
+        const next = jest.fn ()
+
+        middleware ({
+            body: {
+                lastName: 'Doe',
+                firstName: 'John',
+                age: 20
+            }
+        }, {}, next)
+
+        expect (next).toBeCalledTimes (1)
+        expect (next.mock.calls[0].length).toBe (0)
+    })
+
+    it ('calls next with an error when a property is missing and unchecked property', () => {
+        const middleware = fileExistsMiddleware ('body', [ 'lastName', 'age' ])
+        const next = jest.fn ()
+
+        middleware ({
+            body: {
+                lastName: 'Doe',
+                firstName: 'John'
+            }
+        }, {}, next)
+
+        expect (next).toBeCalledTimes (1)
+        expect (next).toBeCalledWith (expect.objectContaining({
+            message: expect.stringContaining ('A property is missing')
+        }))
+    })
 })
