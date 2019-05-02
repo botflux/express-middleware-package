@@ -1,27 +1,27 @@
 const fileExistsMiddleware = require('../../src/middleware/properties-exist-middleware')
 
 describe ('#fileExistsMiddleware', () => {
-    it ('throws an error when propertyName is undefined', () => {
+    it ('throws an error when _propertyName_ is undefined', () => {
         const f = () => fileExistsMiddleware (undefined, [])
 
         expect(f).toThrow (Error)
         expect(f).toThrow ('_propertyName_ must be defined')
     })
 
-    it ('throws an error when propertyName is not a string', () => {
+    it ('throws an error when _propertyName_ is not a string', () => {
         const f = () => fileExistsMiddleware (124, [])
 
         expect(f).toThrow (Error)
         expect(f).toThrow ('_propertyName_ must be a String')
     })
 
-    it ('throws an error when fileLists is undefined', () => {
+    it ('throws an error when _propertiesList_ is undefined', () => {
         const f = () => fileExistsMiddleware ('files', undefined)
         expect(f).toThrow (Error)
         expect(f).toThrow ('_propertiesList_ must be defined')
     })
 
-    it ('throws an error when fileList is not an array', () => {
+    it ('throws an error when _propertiesList_ is not an array', () => {
         const f = () => fileExistsMiddleware ('files', {})
         expect(f).toThrow (Error)
         expect(f).toThrow ('_propertiesList_ must be an array')
@@ -66,7 +66,7 @@ describe ('#fileExistsMiddleware', () => {
         expect (next).toBeCalledTimes (0)
     })
 
-    it ('calls next with an error when a file is missing', () => {
+    it ('calls next with an error when a property is missing', () => {
         const middleware = fileExistsMiddleware ('files', [ 'myFile' ])
         const next = jest.fn ()
 
@@ -78,7 +78,7 @@ describe ('#fileExistsMiddleware', () => {
         }))
     })
 
-    it ('calls next with an error when more than one file is missing', () => {
+    it ('calls next with an error when more than one property is missing', () => {
         const middleware = fileExistsMiddleware ('files', [ 'myFile', 'data', 'data-compressed' ])
         const next = jest.fn ()
 
@@ -94,7 +94,7 @@ describe ('#fileExistsMiddleware', () => {
         }))
     })
 
-    it ('calls next when every specified file is defined', () => {
+    it ('calls next when every specified property is defined', () => {
         const middleware = fileExistsMiddleware ('files', [ 'myFile' ])
         const next = jest.fn ()
 
@@ -108,7 +108,7 @@ describe ('#fileExistsMiddleware', () => {
         expect (next.mock.calls[0].length).toBe (0)
     })
 
-    it ('calls next when every specified files are defined', () => {
+    it ('calls next when every specified properties are defined', () => {
         const middleware = fileExistsMiddleware ('files', [
             'myFile', 'file', 'data'
         ])
@@ -129,7 +129,7 @@ describe ('#fileExistsMiddleware', () => {
         expect (next.mock.calls[0].length).toBe (0)
     })
 
-    it ('calls next with an error when a files is undefined', () => {
+    it ('calls next with an error when a properties is undefined', () => {
         const middleware = fileExistsMiddleware ('files', [ 'myFile' ])
         const next = jest.fn ()
 
@@ -145,7 +145,7 @@ describe ('#fileExistsMiddleware', () => {
         }))
     })
 
-    it ('calls next with an error when more than one file is undefined', () => {
+    it ('calls next with an error when more than one property is undefined', () => {
         const middleware = fileExistsMiddleware ('files', [ 'myFile', 'data', 'file' ])
         const next = jest.fn ()
 
