@@ -1,3 +1,8 @@
+/**
+ * Returns a middleware that calls next with an error when a file of _filesConfiguration_ is not using the correct extension
+ * 
+ * @param {{}} filesConfiguration An object with filenames as keys and array of string as value
+ */
 const fileExtensionMiddleware = filesConfiguration => {
     if (Array.isArray (filesConfiguration) || typeof filesConfiguration !== 'object') throw new Error ('_filesConfiguration_ must be an object') 
 
