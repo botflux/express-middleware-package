@@ -4,18 +4,18 @@
  * @param {{}} filesConfiguration An object with filenames as keys and array of string as value
  */
 const fileExtensionMiddleware = filesConfiguration => {
-    if (Array.isArray (filesConfiguration) || typeof filesConfiguration !== 'object') throw new Error ('_filesConfiguration_ must be an object') 
+    if (Array.isArray (filesConfiguration) || typeof filesConfiguration !== 'object') throw new TypeError ('_filesConfiguration_ must be an object') 
 
     const fileConfiguration = Object.entries (filesConfiguration)
 
     fileConfiguration.forEach (([, value]) => {
         if (!Array.isArray (value)) {
-            throw new Error ('Each key of file configuration must be an array')
+            throw new TypeError ('Each key of file configuration must be an array')
         }
 
         value.forEach (extension => {
             if (typeof extension !== 'string') {
-                throw new Error ('Each item of each file of the configuration must be a string')
+                throw new TypeError ('Each item of each file of the configuration must be a string')
             }
         })
     })

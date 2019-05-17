@@ -2,26 +2,26 @@ const middlewareFactory = require ('../../src/middleware/file-extension-middlewa
 
 describe ('#fileExtensionMiddleware', () => {
     it ('throws an error when the configuration is not an object', () => {
-        expect (() => middlewareFactory ([])).toThrow (Error)
+        expect (() => middlewareFactory ([])).toThrow (TypeError)
         expect (() => middlewareFactory ([])).toThrow ('_filesConfiguration_ must be an object')
         
-        expect (() => middlewareFactory({})).not.toThrow (Error)
+        expect (() => middlewareFactory({})).not.toThrow (TypeError)
 
         const configurationWithObject = { file: {} }
 
-        expect (() => middlewareFactory (configurationWithObject)).toThrow (Error)
+        expect (() => middlewareFactory (configurationWithObject)).toThrow (TypeError)
         expect (() => middlewareFactory (configurationWithObject)).toThrow ('Each key of file configuration must be an array')
 
         const configurationWithArray = { file: [] }
 
-        expect (() => middlewareFactory (configurationWithArray)).not.toThrow (Error)
+        expect (() => middlewareFactory (configurationWithArray)).not.toThrow (TypeError)
 
         const configurationWithArrayOfObjects = { file: [{ }] }
-        expect (() => middlewareFactory (configurationWithArrayOfObjects)).toThrow (Error)
+        expect (() => middlewareFactory (configurationWithArrayOfObjects)).toThrow (TypeError)
         expect (() => middlewareFactory (configurationWithArrayOfObjects)).toThrow ('Each item of each file of the configuration must be a string')
 
         const configurationWithArrayOfStrings = { file: [ 'jpg', 'png' ] }
-        expect (() => middlewareFactory (configurationWithArrayOfStrings)).not.toThrow (Error)
+        expect (() => middlewareFactory (configurationWithArrayOfStrings)).not.toThrow (TypeError)
     })
 
     it ('calls next when every specified files use the right extension', () => {

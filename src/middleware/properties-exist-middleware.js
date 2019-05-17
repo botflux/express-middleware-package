@@ -6,16 +6,16 @@
  */
 const propertiesExistMiddleware = (propertyName, propertiesList) => {
     if (!propertyName) 
-        throw new Error ('_propertyName_ must be defined')
+        throw new TypeError ('_propertyName_ must be defined')
 
     if (!(typeof propertyName === 'string')) 
-        throw new Error ('_propertyName_ must be a String')
+        throw new TypeError ('_propertyName_ must be a String')
 
     if (!propertiesList)
-        throw new Error ('_propertiesList_ must be defined')
+        throw new TypeError ('_propertiesList_ must be defined')
 
     if (!Array.isArray(propertiesList))
-        throw new Error ('_propertiesList_ must be an array')
+        throw new TypeError ('_propertiesList_ must be an array')
 
     return (req, res, next) => {
         if (!(propertyName in req)) {

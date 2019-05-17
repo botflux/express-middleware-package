@@ -4,26 +4,26 @@ describe ('#fileExistsMiddleware', () => {
     it ('throws an error when _propertyName_ is undefined', () => {
         const f = () => fileExistsMiddleware (undefined, [])
 
-        expect(f).toThrow (Error)
+        expect(f).toThrow (TypeError)
         expect(f).toThrow ('_propertyName_ must be defined')
     })
 
     it ('throws an error when _propertyName_ is not a string', () => {
         const f = () => fileExistsMiddleware (124, [])
 
-        expect(f).toThrow (Error)
+        expect(f).toThrow (TypeError)
         expect(f).toThrow ('_propertyName_ must be a String')
     })
 
     it ('throws an error when _propertiesList_ is undefined', () => {
         const f = () => fileExistsMiddleware ('files', undefined)
-        expect(f).toThrow (Error)
+        expect(f).toThrow (TypeError)
         expect(f).toThrow ('_propertiesList_ must be defined')
     })
 
     it ('throws an error when _propertiesList_ is not an array', () => {
         const f = () => fileExistsMiddleware ('files', {})
-        expect(f).toThrow (Error)
+        expect(f).toThrow (TypeError)
         expect(f).toThrow ('_propertiesList_ must be an array')
     })
 
