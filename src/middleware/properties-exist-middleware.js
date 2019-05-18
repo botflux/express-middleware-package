@@ -1,3 +1,5 @@
+const MiddlewareError = require ('../error/properties-exist-middleware-error')
+
 /**
  * Make a _propertiesExistMiddleware_. This middleware can be used to check if properties are defined in an property of the request object.
  * 
@@ -19,21 +21,23 @@ const propertiesExistMiddleware = (propertyName, propertiesList) => {
 
     return (req, res, next) => {
         if (!(propertyName in req)) {
-            throw new Error (`The property _${propertyName}_ specified by _propertyName_ in file-exists-middleware is not defined`)
+            throw new TypeError (`The property _${propertyName}_ specified by _propertyName_ in file-exists-middleware is not defined`)
         }
 
         if (Array.isArray(req[propertyName]) || typeof req[propertyName] !== 'object') {
-            throw new Error (`The request property _${propertyName}_ specified by _propertyName_ must be an object`)
+            throw new TypeError (`The request property _${propertyName}_ specified by _propertyName_ must be an object`)
         }
 
         const keys = Object.keys (req[propertyName])
 
-        const missing = ! (
-            propertiesList.reduce ((prev, curr) => keys.includes (curr) && !!req[propertyName][curr] ? prev : false, true)
-        )
-
-        if (missing) {
-            return next (new Error ('A property is missing'))
+        const missing = propertiesList.reduce ((prev, curr) => keys.includes (curr) && !!req[propertyName][curr] ? prev : [...prev, curr], [])
+        
+        if (missing.length > 0) {
+            // return next (new Error ('A property is missing'))
+            return next (new MiddlewareError ({
+                expected: propertiesList,
+                received: missing
+            }, 'A property is missing'))
         }
 
         next ()

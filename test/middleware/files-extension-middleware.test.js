@@ -1,4 +1,6 @@
 const middlewareFactory = require ('../../src/middleware/file-extension-middleware')
+const { FILE_EXTENSION_MIDDLEWARE_ERROR } = require ('../../src/error/types')
+const MiddlewareError = require ('../../src/error/file-extension-middleware-error')
 
 describe ('#fileExtensionMiddleware', () => {
     it ('throws an error when the configuration is not an object', () => {
@@ -77,8 +79,18 @@ describe ('#fileExtensionMiddleware', () => {
         middleware (req, {}, next)
 
         expect (next).toBeCalledTimes (1)
-        expect (next).toBeCalledWith (expect.objectContaining ({
-            message: 'Invalid file extension'
-        }))
+        const error = next.mock.calls[0][0]
+
+        expect (error).toHaveProperty ('message', 'Invalid file extension')
+        expect (error).toHaveProperty ('files', {
+            expected: {
+                csvDocument: [ 'csv' ],
+                jsonFile: [ 'json' ],
+                image: [ 'png', 'jpg', 'jpeg', 'webp' ]
+            },
+            received: [
+                'jsonFile'
+            ]
+        })
     })
 })

@@ -1,70 +1,76 @@
 const fileExistsMiddleware = require('../../src/middleware/properties-exist-middleware')
 
 describe ('#fileExistsMiddleware', () => {
-    it ('throws an error when _propertyName_ is undefined', () => {
-        const f = () => fileExistsMiddleware (undefined, [])
 
-        expect(f).toThrow (TypeError)
-        expect(f).toThrow ('_propertyName_ must be defined')
+    describe ('configuration errors', () => {
+        it ('throws an error when _propertyName_ is undefined', () => {
+            const f = () => fileExistsMiddleware (undefined, [])
+
+            expect(f).toThrow (TypeError)
+            expect(f).toThrow ('_propertyName_ must be defined')
+        })
+
+        it ('throws an error when _propertyName_ is not a string', () => {
+            const f = () => fileExistsMiddleware (124, [])
+
+            expect(f).toThrow (TypeError)
+            expect(f).toThrow ('_propertyName_ must be a String')
+        })
+
+        it ('throws an error when _propertiesList_ is undefined', () => {
+            const f = () => fileExistsMiddleware ('files', undefined)
+            expect(f).toThrow (TypeError)
+            expect(f).toThrow ('_propertiesList_ must be defined')
+        })
+
+        it ('throws an error when _propertiesList_ is not an array', () => {
+            const f = () => fileExistsMiddleware ('files', {})
+            expect(f).toThrow (TypeError)
+            expect(f).toThrow ('_propertiesList_ must be an array')
+        })
     })
 
-    it ('throws an error when _propertyName_ is not a string', () => {
-        const f = () => fileExistsMiddleware (124, [])
-
-        expect(f).toThrow (TypeError)
-        expect(f).toThrow ('_propertyName_ must be a String')
-    })
-
-    it ('throws an error when _propertiesList_ is undefined', () => {
-        const f = () => fileExistsMiddleware ('files', undefined)
-        expect(f).toThrow (TypeError)
-        expect(f).toThrow ('_propertiesList_ must be defined')
-    })
-
-    it ('throws an error when _propertiesList_ is not an array', () => {
-        const f = () => fileExistsMiddleware ('files', {})
-        expect(f).toThrow (TypeError)
-        expect(f).toThrow ('_propertiesList_ must be an array')
-    })
-
-    it ('throws an error when the request object has no _propertyName_ property', () => {
-        const middleware = fileExistsMiddleware ('body', [])
-        const next = jest.fn ()
-        
-        const f = () => middleware ({
+    describe ('request object errors', () => {
+        it ('throws an error when the request object has no _propertyName_ property', () => {
+            const middleware = fileExistsMiddleware ('body', [])
+            const next = jest.fn ()
             
-        }, {}, next)
+            const f = () => middleware ({
+                
+            }, {}, next)
 
-        expect (f).toThrow (Error)
-        expect (f).toThrow ('The property _body_ specified by _propertyName_ in file-exists-middleware is not defined')
-        expect (next).toBeCalledTimes (0)
+            expect (f).toThrow (TypeError)
+            expect (f).toThrow ('The property _body_ specified by _propertyName_ in file-exists-middleware is not defined')
+            expect (next).toBeCalledTimes (0)
+        })
+
+        it ('throws an error when the request property _propertyName_ is an array', () => {
+            const middleware = fileExistsMiddleware ('files', [])
+            const next = jest.fn ()
+            
+            const f = () => middleware ({
+                files: []
+            }, {}, next)
+
+            expect (f).toThrow (TypeError)
+            expect (f).toThrow ('The request property _files_ specified by _propertyName_ must be an object')
+            expect (next).toBeCalledTimes (0)
+        })
+
+        it ('throws an error when the request property _propertyName_ is not an object', () => {
+            const middleware = fileExistsMiddleware ('files', [])
+            const next = jest.fn ()
+            
+            const f = () => middleware ({
+                files: 'Not an object'
+            }, {}, next)
+
+            expect (f).toThrow (TypeError)
+            expect (f).toThrow ('The request property _files_ specified by _propertyName_ must be an object')
+            expect (next).toBeCalledTimes (0)
+        })
     })
 
-    it ('throws an error when the request property _propertyName_ is an array', () => {
-        const middleware = fileExistsMiddleware ('files', [])
-        const next = jest.fn ()
-        
-        const f = () => middleware ({
-            files: []
-        }, {}, next)
-
-        expect (f).toThrow (Error)
-        expect (f).toThrow ('The request property _files_ specified by _propertyName_ must be an object')
-        expect (next).toBeCalledTimes (0)
-    })
-
-    it ('throws an error when the request property _propertyName_ is not an object', () => {
-        const middleware = fileExistsMiddleware ('files', [])
-        const next = jest.fn ()
-        
-        const f = () => middleware ({
-            files: 'Not an object'
-        }, {}, next)
-
-        expect (f).toThrow (Error)
-        expect (f).toThrow ('The request property _files_ specified by _propertyName_ must be an object')
-        expect (next).toBeCalledTimes (0)
-    })
 
     it ('calls next with an error when a property is missing', () => {
         const middleware = fileExistsMiddleware ('files', [ 'myFile' ])
@@ -74,6 +80,10 @@ describe ('#fileExistsMiddleware', () => {
 
         expect (next).toBeCalledTimes (1)
         expect (next).toBeCalledWith (expect.objectContaining ({
+            propertiesNames: expect.objectContaining({
+                expected: expect.arrayContaining([ 'myFile' ]),
+                received: expect.arrayContaining([ 'myFile' ])
+            }),
             message: expect.stringContaining ('A property is missing')
         }))
     })
@@ -90,6 +100,10 @@ describe ('#fileExistsMiddleware', () => {
 
         expect (next).toBeCalledTimes (1)
         expect (next).toBeCalledWith (expect.objectContaining ({
+            propertiesNames: expect.objectContaining({
+                expected: expect.arrayContaining([ 'myFile', 'data', 'data-compressed' ]),
+                received: expect.arrayContaining([ 'myFile', 'data' ])
+            }),
             message: expect.stringContaining ('A property is missing')
         }))
     })
@@ -141,7 +155,11 @@ describe ('#fileExistsMiddleware', () => {
 
         expect (next).toBeCalledTimes (1)
         expect (next).toBeCalledWith (expect.objectContaining ({
-            message: expect.stringContaining ('A property is missing')
+            message: expect.stringContaining ('A property is missing'),
+            propertiesNames: expect.objectContaining ({
+                expected: expect.arrayContaining ([ 'myFile' ]),
+                received: expect.arrayContaining ([ 'myFile' ])
+            })
         }))
     })
 
@@ -159,7 +177,11 @@ describe ('#fileExistsMiddleware', () => {
 
         expect (next).toBeCalledTimes (1)
         expect (next).toBeCalledWith (expect.objectContaining ({
-            message: expect.stringContaining ('A property is missing')
+            message: expect.stringContaining ('A property is missing'),
+            propertiesNames: expect.objectContaining({
+                expected: expect.arrayContaining([ 'myFile', 'data', 'file' ]),
+                received: expect.arrayContaining([ 'myFile', 'data' ])
+            })
         }))
     })
 
@@ -192,7 +214,11 @@ describe ('#fileExistsMiddleware', () => {
 
         expect (next).toBeCalledTimes (1)
         expect (next).toBeCalledWith (expect.objectContaining({
-            message: expect.stringContaining ('A property is missing')
+            message: expect.stringContaining ('A property is missing'),
+            propertiesNames: expect.objectContaining({
+                expected: expect.arrayContaining ([ 'lastName', 'age' ]),
+                received: expect.arrayContaining ([ 'age' ])
+            })
         }))
     })
 })

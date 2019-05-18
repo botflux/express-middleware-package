@@ -1,3 +1,5 @@
+const MiddlewareError = require ('../error/file-extension-middleware-error')
+
 /**
  * Returns a middleware that calls next with an error when a file of _filesConfiguration_ is not using the correct extension
  * 
@@ -21,11 +23,11 @@ const fileExtensionMiddleware = filesConfiguration => {
     })
 
     return (req, res, next) => {
-        const fileIsValid = fileConfiguration.reduce ((prev, [filename, extensions]) => {
+        const invalidFilenames = fileConfiguration.reduce ((prev, [filename, extensions]) => {
             const file = req.files[filename]
 
             if (!file) {
-                return false
+                return prev
             }
 
             const { name } = file
@@ -33,14 +35,17 @@ const fileExtensionMiddleware = filesConfiguration => {
             const { extension } = regexResult.groups
             
             if (!extensions.includes (extension)) {
-                return false
+                return [...prev, filename]
             }
 
             return prev
-        }, true)
+        }, [])
 
-        if (!fileIsValid) {
-            return next (new Error ('Invalid file extension'))
+        if (invalidFilenames.length > 0) {
+            return next (new MiddlewareError ({
+                expected: filesConfiguration,
+                received: invalidFilenames
+            }, 'Invalid file extension'))
         }
 
         return next ()
