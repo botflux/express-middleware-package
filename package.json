@@ -15,7 +15,7 @@
     "express",
     "middleware"
   ],
-  "author": "Victor Mendele <victor.mendele68@gmail.com\t>",
+  "author": "Victor Mendele <victor.mendele68@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/botflux/express-middleware-package/issues"
